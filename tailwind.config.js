@@ -21,7 +21,7 @@ module.exports = {
         border: "hsl(213, 70%, 50%)",
         input: "hsl(213, 70%, 95%)",
         ring: "hsl(213, 70%, 40%)",
-        background: "hsl(213, 100%, 98%)",
+        background: "hsl(213, 100%, 95%)",
         foreground: "hsl(213, 70%, 15%)",
         primary: {
           DEFAULT: "hsl(213, 70%, 50%)",
