@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Camera } from 'lucide-react';
+import { Model } from 'clarifai';
 
 const AgeVerification = () => {
   const [idImage, setIdImage] = useState(null);
   const [faceImage, setFaceImage] = useState(null);
+  const [faceDetected, setFaceDetected] = useState(false);
   const videoRef = useRef(null);
 
   const handleIdUpload = (event) => {
@@ -38,12 +40,42 @@ const AgeVerification = () => {
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
     canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
-    setFaceImage(canvas.toDataURL('image/jpeg'));
+    const capturedImage = canvas.toDataURL('image/jpeg');
+    setFaceImage(capturedImage);
+    detectFace(capturedImage);
+  };
+
+  const detectFace = async (imageUrl) => {
+    const model = new Model({
+      url: "https://clarifai.com/clarifai/main/models/face-detection",
+      pat: "f21f68342be24e7aa6cdf603bc4e1fbb",
+    });
+
+    try {
+      const response = await model.predict_by_url(imageUrl, { input_type: "image" });
+      const regions = response.outputs[0].data.regions;
+
+      if (regions && regions.length > 0) {
+        setFaceDetected(true);
+        toast.success("Face detected successfully!");
+      } else {
+        setFaceDetected(false);
+        toast.error("No face detected. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error detecting face:", error);
+      toast.error("Error detecting face. Please try again.");
+    }
   };
 
   const verifyAge = async () => {
     if (!idImage || !faceImage) {
       toast.error("Please upload ID and capture face image");
+      return;
+    }
+
+    if (!faceDetected) {
+      toast.error("Face not detected. Please capture a clear face image.");
       return;
     }
 
@@ -68,8 +100,9 @@ const AgeVerification = () => {
         <video ref={videoRef} autoPlay className="mb-2" />
         <Button onClick={captureImage}>Capture Image</Button>
         {faceImage && <img src={faceImage} alt="Face" className="mt-2 max-w-xs" />}
+        {faceDetected && <p className="text-green-500 mt-2">Face detected!</p>}
       </Card>
-      <Button onClick={verifyAge} className="w-full">Verify Age</Button>
+      <Button onClick={verifyAge} className="w-full" disabled={!faceDetected}>Verify Age</Button>
     </div>
   );
 };
