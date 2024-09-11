@@ -141,13 +141,16 @@ const AgeVerification = () => {
               <Camera className="mr-2 h-4 w-4" /> Open Camera
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Capture Face Image</DialogTitle>
             </DialogHeader>
             <div className="space-y-2">
               <video ref={videoRef} autoPlay playsInline className="w-full rounded-md" />
-              <Button onClick={captureImage} className="w-full">Capture Image</Button>
+              <div className="flex justify-between mt-4">
+                <Button onClick={() => setIsDialogOpen(false)} variant="outline" className="w-[48%]">Cancel</Button>
+                <Button onClick={captureImage} className="w-[48%]">Capture</Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
