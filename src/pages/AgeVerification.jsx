@@ -65,6 +65,13 @@ const AgeVerification = () => {
     }
   };
 
+  const handleDialogClose = (open) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      stopCamera();
+    }
+  };
+
   const verifyAge = async () => {
     if (!idImage || !faceImage || !birthDate) {
       toast.error("Please upload ID, capture face image, and enter birth date");
@@ -107,7 +114,7 @@ const AgeVerification = () => {
       </Card>
       <Card className="p-4 mb-4">
         <h2 className="text-xl mb-2 text-center">Face Detection</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
             <Button onClick={() => {
               setIsDialogOpen(true);
