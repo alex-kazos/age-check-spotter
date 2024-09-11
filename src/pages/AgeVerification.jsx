@@ -5,6 +5,13 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Camera, Upload } from 'lucide-react';
 import axios from 'axios';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const AgeVerification = () => {
   const [idImage, setIdImage] = useState(null);
@@ -12,6 +19,7 @@ const AgeVerification = () => {
   const [birthDate, setBirthDate] = useState('');
   const videoRef = useRef(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleIdUpload = (event) => {
     const file = event.target.files[0];
@@ -46,6 +54,7 @@ const AgeVerification = () => {
       canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
       setFaceImage(canvas.toDataURL('image/jpeg'));
       stopCamera();
+      setIsDialogOpen(false);
     }
   };
 
@@ -98,16 +107,25 @@ const AgeVerification = () => {
       </Card>
       <Card className="p-4 mb-4">
         <h2 className="text-xl mb-2 text-center">Face Detection</h2>
-        {!isCameraActive ? (
-          <Button onClick={startCamera} className="w-full mb-2">
-            <Camera className="mr-2 h-4 w-4" /> Start Camera
-          </Button>
-        ) : (
-          <div className="space-y-2">
-            <video ref={videoRef} autoPlay playsInline className="w-full rounded-md" />
-            <Button onClick={captureImage} className="w-full">Capture Image</Button>
-          </div>
-        )}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={() => {
+              setIsDialogOpen(true);
+              startCamera();
+            }} className="w-full mb-2">
+              <Camera className="mr-2 h-4 w-4" /> Open Camera
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Capture Face Image</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              <video ref={videoRef} autoPlay playsInline className="w-full rounded-md" />
+              <Button onClick={captureImage} className="w-full">Capture Image</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
         {faceImage && <img src={faceImage} alt="Face" className="mt-4 w-full rounded-md" />}
       </Card>
       <Card className="p-4 mb-4">
