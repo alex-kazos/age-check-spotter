@@ -29,6 +29,7 @@ const AgeVerification = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.play();
         setIsCameraActive(true);
       }
     } catch (err) {
@@ -38,14 +39,20 @@ const AgeVerification = () => {
   };
 
   const captureImage = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
-    setFaceImage(canvas.toDataURL('image/jpeg'));
-    setIsCameraActive(false);
-    if (videoRef.current.srcObject) {
+    if (videoRef.current) {
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
+      setFaceImage(canvas.toDataURL('image/jpeg'));
+      stopCamera();
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
       videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      setIsCameraActive(false);
     }
   };
 
@@ -96,10 +103,12 @@ const AgeVerification = () => {
             <Camera className="mr-2 h-4 w-4" /> Start Camera
           </Button>
         ) : (
-          <Button onClick={captureImage} className="w-full mb-2">Capture Image</Button>
+          <div className="space-y-2">
+            <video ref={videoRef} autoPlay playsInline className="w-full rounded-md" />
+            <Button onClick={captureImage} className="w-full">Capture Image</Button>
+          </div>
         )}
-        {isCameraActive && <video ref={videoRef} autoPlay playsInline className="w-full rounded-md mb-2" />}
-        {faceImage && <img src={faceImage} alt="Face" className="w-full rounded-md" />}
+        {faceImage && <img src={faceImage} alt="Face" className="mt-4 w-full rounded-md" />}
       </Card>
       <Card className="p-4 mb-4">
         <h2 className="text-xl mb-2 text-center">Birth Date</h2>
