@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { toast } from "sonner";
 import { Camera, Upload, FileText } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -47,7 +46,7 @@ const AgeVerification = () => {
     try {
       const constraints = {
         video: {
-          facingMode: { ideal: "user" },
+          facingMode: "user",
           width: { ideal: 1280 },
           height: { ideal: 720 }
         }
@@ -139,7 +138,7 @@ const AgeVerification = () => {
         <h2 className="text-xl mb-2 text-center">Upload ID</h2>
         <label htmlFor="id-upload" className="flex flex-col items-center p-4 bg-secondary text-secondary-foreground rounded-md cursor-pointer">
           <Upload className="w-8 h-8 mb-2" />
-          <span>Choose ID Image or PDF</span>
+          <span className="text-center">Choose ID Image or PDF</span>
           <Input id="id-upload" type="file" onChange={handleIdUpload} accept="image/*,application/pdf" className="hidden" />
         </label>
         {idPreview}
