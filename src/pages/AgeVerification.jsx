@@ -165,9 +165,10 @@ const AgeVerification = () => {
       <Card className="p-4 mb-4">
         <h2 className="text-xl mb-2 text-center">Birth Date</h2>
         <Input
-          type="date"
+          type="text"
           value={birthDate}
           onChange={(e) => setBirthDate(e.target.value)}
+          placeholder="DD/MM/YYYY"
           className="w-full"
         />
       </Card>
