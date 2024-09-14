@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Camera, Upload } from 'lucide-react';
+import { Camera, Upload, FileText } from 'lucide-react';
 import axios from 'axios';
 import {
   Dialog,
@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/dialog";
 
 const AgeVerification = () => {
-  const [idImage, setIdImage] = useState(null);
+  const [idFile, setIdFile] = useState(null);
+  const [idPreview, setIdPreview] = useState(null);
   const [faceImage, setFaceImage] = useState(null);
   const [birthDate, setBirthDate] = useState('');
   const videoRef = useRef(null);
@@ -24,25 +25,37 @@ const AgeVerification = () => {
   const handleIdUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setIdImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setIdFile(file);
+      if (file.type === 'application/pdf') {
+        setIdPreview(<FileText className="w-16 h-16 mx-auto mt-4" />);
+      } else {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setIdPreview(<img src={reader.result} alt="ID Preview" className="mt-4 w-full rounded-md" />);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+      const constraints = {
+        video: {
+          facingMode: { ideal: "user" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        await videoRef.current.play();
         setIsCameraActive(true);
       }
     } catch (err) {
       console.error("Error accessing camera:", err);
-      toast.error("Failed to access camera");
+      toast.error("Failed to access camera. Please ensure camera permissions are granted.");
     }
   };
 
@@ -65,17 +78,29 @@ const AgeVerification = () => {
     }
   };
 
+  const handleDialogClose = (open) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      stopCamera();
+    }
+  };
+
   const verifyAge = async () => {
-    if (!idImage || !faceImage || !birthDate) {
+    if (!idFile || !faceImage || !birthDate) {
       toast.error("Please upload ID, capture face image, and enter birth date");
       return;
     }
 
+    const formData = new FormData();
+    formData.append('id_file', idFile);
+    formData.append('face_image', faceImage);
+    formData.append('birth_date', birthDate);
+
     try {
-      const response = await axios.post('http://localhost:5000/verify', {
-        id_image: idImage,
-        face_image: faceImage,
-        birth_date: birthDate
+      const response = await axios.post('http://localhost:5000/verify', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
       const { face_match, age, is_over_18 } = response.data;
@@ -100,14 +125,14 @@ const AgeVerification = () => {
         <h2 className="text-xl mb-2 text-center">Upload ID</h2>
         <label htmlFor="id-upload" className="flex flex-col items-center p-4 bg-secondary text-secondary-foreground rounded-md cursor-pointer">
           <Upload className="w-8 h-8 mb-2" />
-          <span>Choose ID Image</span>
-          <Input id="id-upload" type="file" onChange={handleIdUpload} accept="image/*" className="hidden" />
+          <span>Choose ID Image or PDF</span>
+          <Input id="id-upload" type="file" onChange={handleIdUpload} accept="image/*,application/pdf" className="hidden" />
         </label>
-        {idImage && <img src={idImage} alt="ID" className="mt-4 w-full rounded-md" />}
+        {idPreview}
       </Card>
       <Card className="p-4 mb-4">
         <h2 className="text-xl mb-2 text-center">Face Detection</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
             <Button onClick={() => {
               setIsDialogOpen(true);
@@ -137,7 +162,7 @@ const AgeVerification = () => {
           className="w-full"
         />
       </Card>
-      <Button onClick={verifyAge} className="w-full" disabled={!idImage || !faceImage || !birthDate}>
+      <Button onClick={verifyAge} className="w-full" disabled={!idFile || !faceImage || !birthDate}>
         Verify Age
       </Button>
     </div>
