@@ -47,7 +47,7 @@
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.1.5",
     "face-api.js": "^0.22.2",
-    "framer-motion": "^11.3.9",
+    "framer-motion": "^11.5.4",
     "html-to-image": "^1.11.11",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.417.0",

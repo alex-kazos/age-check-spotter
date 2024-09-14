@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Camera, Upload, FileText } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,8 @@ const AgeVerification = () => {
   const videoRef = useRef(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const navigate = useNavigate();
 
   const handleIdUpload = (event) => {
     const file = event.target.files[0];
@@ -91,6 +94,7 @@ const AgeVerification = () => {
       return;
     }
 
+    setIsVerifying(true);
     const formData = new FormData();
     formData.append('id_file', idFile);
     formData.append('face_image', faceImage);
@@ -106,15 +110,17 @@ const AgeVerification = () => {
       const { face_match, age, is_over_18 } = response.data;
 
       if (face_match && is_over_18) {
-        toast.success(`Age verification successful! You are ${age} years old.`);
+        navigate('/age-verified', { state: { age } });
       } else if (!face_match) {
-        toast.error("Face does not match the ID. Please try again.");
+        navigate('/age-not-verified', { state: { reason: 'face_mismatch' } });
       } else {
-        toast.error("You must be 18 or older to proceed");
+        navigate('/age-not-verified', { state: { reason: 'underage' } });
       }
     } catch (error) {
       console.error("Error during verification:", error);
-      toast.error("An error occurred during verification. Please try again.");
+      navigate('/age-not-verified', { state: { reason: 'error' } });
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -165,8 +171,8 @@ const AgeVerification = () => {
           className="w-full"
         />
       </Card>
-      <Button onClick={verifyAge} className="w-full" disabled={!idFile || !faceImage || !birthDate}>
-        Verify Age
+      <Button onClick={verifyAge} className="w-full" disabled={!idFile || !faceImage || !birthDate || isVerifying}>
+        {isVerifying ? 'Verifying...' : 'Verify Age'}
       </Button>
     </div>
   );
