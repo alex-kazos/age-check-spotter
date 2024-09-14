@@ -1,12 +1,10 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 const AgeVerified = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { age } = location.state || {};
 
   return (
     <motion.div
@@ -15,9 +13,9 @@ const AgeVerified = () => {
       transition={{ duration: 0.5 }}
       className="min-h-screen flex items-center justify-center bg-green-100"
     >
-      <div className="text-center p-8 bg-white rounded-lg shadow-xl">
+      <div className="text-center p-8 bg-white rounded-lg shadow-xl max-w-sm mx-auto">
         <h1 className="text-4xl font-bold text-green-600 mb-4">Age Verified</h1>
-        <p className="text-xl mb-6">Your age has been verified. You are {age} years old.</p>
+        <p className="text-xl mb-6">Your age has been verified. You can proceed with your order.</p>
         <Button onClick={() => navigate('/continue-order')} className="mr-4">
           Continue Order
         </Button>
