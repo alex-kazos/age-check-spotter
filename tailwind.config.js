@@ -18,38 +18,38 @@ module.exports = {
     },
     extend: {
       colors: {
-        border: "hsl(213, 70%, 50%)",
-        input: "hsl(213, 70%, 95%)",
-        ring: "hsl(213, 70%, 40%)",
-        background: "hsl(213, 100%, 95%)",
-        foreground: "hsl(213, 70%, 15%)",
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(213, 70%, 50%)",
-          foreground: "hsl(213, 100%, 98%)",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(213, 30%, 90%)",
-          foreground: "hsl(213, 70%, 15%)",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
-          DEFAULT: "hsl(0, 84.2%, 60.2%)",
-          foreground: "hsl(213, 100%, 98%)",
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "hsl(213, 30%, 90%)",
-          foreground: "hsl(213, 70%, 40%)",
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(213, 70%, 80%)",
-          foreground: "hsl(213, 70%, 15%)",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
-          DEFAULT: "hsl(213, 100%, 98%)",
-          foreground: "hsl(213, 70%, 15%)",
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "hsl(213, 100%, 98%)",
-          foreground: "hsl(213, 70%, 15%)",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
       },
       borderRadius: {
