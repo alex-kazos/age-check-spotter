@@ -1,34 +1,52 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Camera, Upload } from 'lucide-react';
-import axios from 'axios';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { createWorker } from 'tesseract.js';
+import * as faceapi from 'face-api.js';
 
 const AgeVerification = () => {
   const [idImage, setIdImage] = useState(null);
   const [faceImage, setFaceImage] = useState(null);
-  const [birthDate, setBirthDate] = useState('');
+  const [birthDate, setBirthDate] = useState(null);
   const videoRef = useRef(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleIdUpload = (event) => {
+  useEffect(() => {
+    const loadModels = async () => {
+      await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
+      await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+      await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+    };
+    loadModels();
+  }, []);
+
+  const handleIdUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         setIdImage(reader.result);
+        await extractBirthDate(reader.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const extractBirthDate = async (imageData) => {
+    const worker = await createWorker('eng');
+    const { data: { text } } = await worker.recognize(imageData);
+    await worker.terminate();
+
+    const dateRegex = /\b\d{2}[/-]\d{2}[/-]\d{4}\b/;
+    const match = text.match(dateRegex);
+    if (match) {
+      setBirthDate(match[0]);
+      toast.success(`Birth date extracted: ${match[0]}`);
+    } else {
+      toast.error('Could not extract birth date from ID');
     }
   };
 
@@ -37,7 +55,6 @@ const AgeVerification = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
         setIsCameraActive(true);
       }
     } catch (err) {
@@ -47,56 +64,49 @@ const AgeVerification = () => {
   };
 
   const captureImage = () => {
-    if (videoRef.current) {
-      const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
-      setFaceImage(canvas.toDataURL('image/jpeg'));
-      stopCamera();
-      setIsDialogOpen(false);
-    }
-  };
-
-  const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
+    setFaceImage(canvas.toDataURL('image/jpeg'));
+    setIsCameraActive(false);
+    if (videoRef.current.srcObject) {
       videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-      setIsCameraActive(false);
-    }
-  };
-
-  const handleDialogClose = (open) => {
-    setIsDialogOpen(open);
-    if (!open) {
-      stopCamera();
     }
   };
 
   const verifyAge = async () => {
     if (!idImage || !faceImage || !birthDate) {
-      toast.error("Please upload ID, capture face image, and enter birth date");
+      toast.error("Please upload ID, capture face image, and ensure birth date is extracted");
       return;
     }
 
-    try {
-      const response = await axios.post('http://localhost:5000/verify', {
-        id_image: idImage,
-        face_image: faceImage,
-        birth_date: birthDate
-      });
+    // Check if the person is over 18
+    const birthDateObj = new Date(birthDate);
+    const ageDifMs = Date.now() - birthDateObj.getTime();
+    const ageDate = new Date(ageDifMs);
+    const age = Math.abs(ageDate.getUTCFullYear() - 1970);
 
-      const { face_match, age, is_over_18 } = response.data;
+    if (age < 18) {
+      toast.error("You must be 18 or older to proceed");
+      return;
+    }
 
-      if (face_match && is_over_18) {
-        toast.success(`Age verification successful! You are ${age} years old.`);
-      } else if (!face_match) {
-        toast.error("Face does not match the ID. Please try again.");
+    // Compare faces
+    const idFaceDetection = await faceapi.detectSingleFace(idImage).withFaceLandmarks().withFaceDescriptor();
+    const liveFaceDetection = await faceapi.detectSingleFace(faceImage).withFaceLandmarks().withFaceDescriptor();
+
+    if (idFaceDetection && liveFaceDetection) {
+      const faceMatcher = new faceapi.FaceMatcher(idFaceDetection);
+      const match = faceMatcher.findBestMatch(liveFaceDetection.descriptor);
+
+      if (match.distance < 0.6) {
+        toast.success("Age verification successful! Face match confirmed.");
       } else {
-        toast.error("You must be 18 or older to proceed");
+        toast.error("Face does not match the ID. Please try again.");
       }
-    } catch (error) {
-      console.error("Error during verification:", error);
-      toast.error("An error occurred during verification. Please try again.");
+    } else {
+      toast.error("Could not detect faces in both images. Please try again.");
     }
   };
 
@@ -111,38 +121,19 @@ const AgeVerification = () => {
           <Input id="id-upload" type="file" onChange={handleIdUpload} accept="image/*" className="hidden" />
         </label>
         {idImage && <img src={idImage} alt="ID" className="mt-4 w-full rounded-md" />}
+        {birthDate && <p className="mt-2 text-center">Extracted Birth Date: {birthDate}</p>}
       </Card>
       <Card className="p-4 mb-4">
         <h2 className="text-xl mb-2 text-center">Face Detection</h2>
-        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
-          <DialogTrigger asChild>
-            <Button onClick={() => {
-              setIsDialogOpen(true);
-              startCamera();
-            }} className="w-full mb-2">
-              <Camera className="mr-2 h-4 w-4" /> Open Camera
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Capture Face Image</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-2">
-              <video ref={videoRef} autoPlay playsInline className="w-full rounded-md" />
-              <Button onClick={captureImage} className="w-full">Capture Image</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-        {faceImage && <img src={faceImage} alt="Face" className="mt-4 w-full rounded-md" />}
-      </Card>
-      <Card className="p-4 mb-4">
-        <h2 className="text-xl mb-2 text-center">Birth Date</h2>
-        <Input
-          type="date"
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-          className="w-full"
-        />
+        {!isCameraActive ? (
+          <Button onClick={startCamera} className="w-full mb-2">
+            <Camera className="mr-2 h-4 w-4" /> Start Camera
+          </Button>
+        ) : (
+          <Button onClick={captureImage} className="w-full mb-2">Capture Image</Button>
+        )}
+        {isCameraActive && <video ref={videoRef} autoPlay playsInline className="w-full rounded-md mb-2" />}
+        {faceImage && <img src={faceImage} alt="Face" className="w-full rounded-md" />}
       </Card>
       <Button onClick={verifyAge} className="w-full" disabled={!idImage || !faceImage || !birthDate}>
         Verify Age
