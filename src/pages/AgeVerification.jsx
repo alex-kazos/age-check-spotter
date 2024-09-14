@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useToast } from '@/hooks/useToast';
 
 const AgeVerification = () => {
   const [idFile, setIdFile] = useState(null);
@@ -24,6 +25,7 @@ const AgeVerification = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const handleIdUpload = (event) => {
     const file = event.target.files[0];
@@ -58,7 +60,7 @@ const AgeVerification = () => {
       }
     } catch (err) {
       console.error("Error accessing camera:", err);
-      toast.error("Failed to access camera. Please ensure camera permissions are granted.");
+      showToast("Failed to access camera. Please ensure camera permissions are granted.", "error");
     }
   };
 
@@ -90,7 +92,7 @@ const AgeVerification = () => {
 
   const verifyAge = async () => {
     if (!idFile || !faceImage || !birthDate) {
-      toast.error("Please upload ID, capture face image, and enter birth date");
+      showToast("Please upload ID, capture face image, and enter birth date", "error");
       return;
     }
 
@@ -123,6 +125,12 @@ const AgeVerification = () => {
       setIsVerifying(false);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
 
   return (
     <div className="container mx-auto p-4 max-w-md">
