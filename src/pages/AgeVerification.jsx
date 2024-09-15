@@ -13,12 +13,20 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from '@/hooks/useToast';
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const AgeVerification = () => {
   const [idFile, setIdFile] = useState(null);
   const [idPreview, setIdPreview] = useState(null);
   const [faceImage, setFaceImage] = useState(null);
-  const [birthDate, setBirthDate] = useState('');
+  const [birthDate, setBirthDate] = useState(null);
   const videoRef = useRef(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -91,7 +99,7 @@ const AgeVerification = () => {
 
   const verifyAge = async () => {
     if (!idFile || !faceImage || !birthDate) {
-      showToast("Please upload ID, capture face image, and enter birth date", "error");
+      showToast("Please upload ID, capture face image, and select birth date", "error");
       return;
     }
 
@@ -99,7 +107,7 @@ const AgeVerification = () => {
     const formData = new FormData();
     formData.append('id_file', idFile);
     formData.append('face_image', faceImage);
-    formData.append('birth_date', birthDate);
+    formData.append('birth_date', format(birthDate, 'dd/MM/yyyy'));
 
     try {
       const response = await axios.post('http://localhost:5000/verify', formData, {
@@ -171,13 +179,31 @@ const AgeVerification = () => {
       </Card>
       <Card className="p-4 mb-4">
         <h2 className="text-xl mb-2 text-center">Birth Date</h2>
-        <Input
-          type="text"
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-          placeholder="DD/MM/YYYY"
-          className="w-full"
-        />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !birthDate && "text-muted-foreground"
+              )}
+            >
+              {birthDate ? format(birthDate, "MMMM yyyy") : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={birthDate}
+              onSelect={setBirthDate}
+              initialFocus
+              disabled={(date) => date > new Date() || date < new Date(1900, 0, 1)}
+              captionLayout="dropdown-buttons"
+              fromYear={1900}
+              toYear={new Date().getFullYear()}
+            />
+          </PopoverContent>
+        </Popover>
       </Card>
       <Button onClick={verifyAge} className="w-full" disabled={!idFile || !faceImage || !birthDate || isVerifying}>
         {isVerifying ? 'Verifying...' : 'Verify Age'}
