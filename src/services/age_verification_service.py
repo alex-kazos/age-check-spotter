@@ -12,22 +12,56 @@ def calculate_age(birth_date):
     age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
     return age
 
+def get_face_encoding(image_path):
+    # Load image from path
+    image = face_recognition.load_image_file(image_path)
+    face_encodings = face_recognition.face_encodings(image)
+    if len(face_encodings) == 0:
+        return None
+    return face_encodings[0]
+
+def capture_image_from_camera():
+    # Capture image from camera
+    cam = cv2.VideoCapture(0)
+    ret, frame = cam.read()
+    cam.release()
+    
+    if not ret:
+        return None
+    return frame
+
+def get_camera_encoding():
+    # Capture the image and get face encoding
+    camera_image = capture_image_from_camera()
+    if camera_image is None:
+        return None
+    face_encodings = face_recognition.face_encodings(camera_image)
+    if len(face_encodings) == 0:
+        return None
+    return face_encodings[0]
+
+def compare_faces(id_encoding, camera_encoding, tolerance=0.6):
+    return face_recognition.compare_faces([id_encoding], camera_encoding, tolerance=tolerance)[0]
+
 @app.route('/verify', methods=['POST'])
 def verify_age():
     data = request.json
-    id_image = face_recognition.load_image_file(data['id_image'])
-    face_image = face_recognition.load_image_file(data['face_image'])
     birth_date = data['birth_date']
 
-    # Extract face encodings
-    id_encoding = face_recognition.face_encodings(id_image)[0]
-    face_encoding = face_recognition.face_encodings(face_image)[0]
+    # Load and extract face encoding from ID image
+    id_encoding = get_face_encoding(data['id_image'])
+    if id_encoding is None:
+        return jsonify({'error': 'No face found in ID image'}), 400
 
-    # Compare faces
-    results = face_recognition.compare_faces([id_encoding], face_encoding)
-    face_match = results[0]
+    # Capture and extract face encoding from camera image
+    camera_encoding = get_camera_encoding()
+    if camera_encoding is None:
+        return jsonify({'error': 'No face found in camera image'}), 400
 
-    # Calculate age
+    # Compare faces with some tolerance (wiggle room)
+    face_match = compare_faces(id_encoding, camera_encoding, tolerance=0.6)
+
+    # Calculate age from the birth date
     age = calculate_age(birth_date)
 
     return jsonify({

@@ -13,12 +13,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from '@/hooks/useToast';
+import { DatePicker } from "@/components/ui/date-picker";
 
 const AgeVerification = () => {
   const [idFile, setIdFile] = useState(null);
   const [idPreview, setIdPreview] = useState(null);
   const [faceImage, setFaceImage] = useState(null);
-  const [birthDate, setBirthDate] = useState('');
+  const [birthDate, setBirthDate] = useState(null);
   const videoRef = useRef(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -91,7 +92,7 @@ const AgeVerification = () => {
 
   const verifyAge = async () => {
     if (!idFile || !faceImage || !birthDate) {
-      showToast("Please upload ID, capture face image, and enter birth date", "error");
+      showToast("Please upload ID, capture face image, and select birth date", "error");
       return;
     }
 
@@ -99,7 +100,7 @@ const AgeVerification = () => {
     const formData = new FormData();
     formData.append('id_file', idFile);
     formData.append('face_image', faceImage);
-    formData.append('birth_date', birthDate);
+    formData.append('birth_date', birthDate.toISOString());
 
     try {
       const response = await axios.post('http://localhost:5000/verify', formData, {
@@ -134,7 +135,7 @@ const AgeVerification = () => {
   return (
     <div className="container mx-auto p-4 max-w-md">
       <h1 className="text-2xl font-bold mb-4 text-center">Age Verification</h1>
-      <Card className="p-4 mb-4">
+     <Card className="p-4 mb-4">
         <h2 className="text-xl mb-2 text-center">Upload ID</h2>
         <label htmlFor="id-upload" className="flex flex-col items-center p-4 bg-secondary text-secondary-foreground rounded-md cursor-pointer">
           <Upload className="w-8 h-8 mb-2" />
@@ -171,13 +172,7 @@ const AgeVerification = () => {
       </Card>
       <Card className="p-4 mb-4">
         <h2 className="text-xl mb-2 text-center">Birth Date</h2>
-        <Input
-          type="text"
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-          placeholder="DD/MM/YYYY"
-          className="w-full"
-        />
+        <DatePicker date={birthDate} setDate={setBirthDate} />
       </Card>
       <Button onClick={verifyAge} className="w-full" disabled={!idFile || !faceImage || !birthDate || isVerifying}>
         {isVerifying ? 'Verifying...' : 'Verify Age'}
