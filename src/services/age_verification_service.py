@@ -3,6 +3,7 @@ import face_recognition
 import cv2
 import numpy as np
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
@@ -45,24 +46,41 @@ def compare_faces(id_encoding, camera_encoding, tolerance=0.6):
 
 @app.route('/verify', methods=['POST'])
 def verify_age():
-    data = request.json
-    birth_date = data['birth_date']
+    print("Received data:", request.form)
+    print("Received files:", request.files)
+
+    birth_date = request.form.get('birth_date')
+    id_file = request.files.get('id_file')
+    face_image = request.files.get('face_image')
+
+    if not birth_date or not id_file or not face_image:
+        return jsonify({'error': 'Missing required data'}), 400
+
+    # Save the uploaded files temporarily
+    id_path = 'temp_id.jpg'
+    face_path = 'temp_face.jpg'
+    id_file.save(id_path)
+    face_image.save(face_path)
 
     # Load and extract face encoding from ID image
-    id_encoding = get_face_encoding(data['id_image'])
+    id_encoding = get_face_encoding(id_path)
     if id_encoding is None:
         return jsonify({'error': 'No face found in ID image'}), 400
 
-    # Capture and extract face encoding from camera image
-    camera_encoding = get_camera_encoding()
-    if camera_encoding is None:
-        return jsonify({'error': 'No face found in camera image'}), 400
+    # Load and extract face encoding from uploaded face image
+    face_encoding = get_face_encoding(face_path)
+    if face_encoding is None:
+        return jsonify({'error': 'No face found in uploaded image'}), 400
 
-    # Compare faces with some tolerance (wiggle room)
-    face_match = compare_faces(id_encoding, camera_encoding, tolerance=0.6)
+    # Compare faces
+    face_match = compare_faces(id_encoding, face_encoding)
 
     # Calculate age from the birth date
     age = calculate_age(birth_date)
+
+    # Clean up temporary files
+    os.remove(id_path)
+    os.remove(face_path)
 
     return jsonify({
         'face_match': bool(face_match),

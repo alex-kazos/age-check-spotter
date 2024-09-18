@@ -99,8 +99,20 @@ const AgeVerification = () => {
     setIsVerifying(true);
     const formData = new FormData();
     formData.append('id_file', idFile);
-    formData.append('face_image', faceImage);
-    formData.append('birth_date', birthDate.toISOString());
+
+    // Convert base64 image to Blob
+    const base64Response = await fetch(faceImage);
+    const blob = await base64Response.blob();
+    formData.append('face_image', blob, 'face_image.jpg');
+
+    formData.append('birth_date', birthDate.toISOString().split('T')[0]);
+
+    // Debug log
+    console.log('Sending to server:', {
+      id_file: idFile.name,
+      face_image: 'Blob data',
+      birth_date: birthDate.toISOString().split('T')[0]
+    });
 
     try {
       const response = await axios.post('http://localhost:5000/verify', formData, {
@@ -109,18 +121,11 @@ const AgeVerification = () => {
         }
       });
 
-      const { face_match, age, is_over_18 } = response.data;
-
-      if (face_match && is_over_18) {
-        navigate('/age-verified', { state: { age } });
-      } else if (!face_match) {
-        navigate('/age-not-verified', { state: { reason: 'face_mismatch' } });
-      } else {
-        navigate('/age-not-verified', { state: { reason: 'underage' } });
-      }
+      console.log('Server response:', response.data);
+      // Handle the response as needed
     } catch (error) {
       console.error("Error during verification:", error);
-      navigate('/age-not-verified', { state: { reason: 'error' } });
+      showToast("Error during verification. Please try again.", "error");
     } finally {
       setIsVerifying(false);
     }
