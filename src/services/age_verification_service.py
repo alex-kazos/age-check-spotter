@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import face_recognition
 import cv2
 import numpy as np
@@ -6,6 +7,7 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
+CORS(app)  # This enables CORS for all routes
 
 def calculate_age(birth_date):
     today = datetime.today()

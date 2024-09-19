@@ -115,7 +115,7 @@ const AgeVerification = () => {
     });
 
     try {
-      const response = await axios.post('http://localhost:5000/verify', formData, {
+      const response = await axios.post('http://127.0.0.1:5000/verify', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -160,11 +160,12 @@ const AgeVerification = () => {
               <Camera className="mr-2 h-4 w-4" /> Open Camera
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[425px]" aria-describedby="dialog-description">
             <DialogHeader>
               <DialogTitle>Capture Face Image</DialogTitle>
             </DialogHeader>
             <div className="space-y-2">
+              <p id="dialog-description" className="sr-only">Use this dialog to capture your face image for verification.</p>
               <video ref={videoRef} autoPlay playsInline className="w-full rounded-md" />
               <div className="flex justify-between mt-4">
                 <Button onClick={() => setIsDialogOpen(false)} variant="outline" className="w-[48%]">Cancel</Button>
