@@ -13,7 +13,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from '@/hooks/useToast';
-import { DatePicker } from "@/components/ui/date-picker";
 
 const AgeVerification = () => {
   const [idFile, setIdFile] = useState(null);
@@ -99,20 +98,8 @@ const AgeVerification = () => {
     setIsVerifying(true);
     const formData = new FormData();
     formData.append('id_file', idFile);
-
-    // Convert base64 image to Blob
-    const base64Response = await fetch(faceImage);
-    const blob = await base64Response.blob();
-    formData.append('face_image', blob, 'face_image.jpg');
-
-    formData.append('birth_date', birthDate.toISOString().split('T')[0]);
-
-    // Debug log
-    console.log('Sending to server:', {
-      id_file: idFile.name,
-      face_image: 'Blob data',
-      birth_date: birthDate.toISOString().split('T')[0]
-    });
+    formData.append('face_image', faceImage);
+    formData.append('birth_date', birthDate);
 
     try {
       const response = await axios.post('http://127.0.0.1:5000/verify', formData, {
@@ -178,7 +165,13 @@ const AgeVerification = () => {
       </Card>
       <Card className="p-4 mb-4">
         <h2 className="text-xl mb-2 text-center">Birth Date</h2>
-        <DatePicker date={birthDate} setDate={setBirthDate} />
+        <Input
+          type="text"
+          value={birthDate}
+          onChange={(e) => setBirthDate(e.target.value)}
+          placeholder="DD/MM/YYYY"
+          className="w-full"
+        />
       </Card>
       <Button onClick={verifyAge} className="w-full" disabled={!idFile || !faceImage || !birthDate || isVerifying}>
         {isVerifying ? 'Verifying...' : 'Verify Age'}
