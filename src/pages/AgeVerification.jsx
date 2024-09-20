@@ -99,7 +99,7 @@ const AgeVerification = () => {
     setIsVerifying(true);
     const formData = new FormData();
     formData.append('id_file', idFile);
-    formData.append('face_image', faceImage);
+    formData.append('face_image', faceImage.split(',')[1]); // Remove data:image/jpeg;base64, prefix
     formData.append('birth_date', birthDate.toISOString());
 
     try {
@@ -120,6 +120,7 @@ const AgeVerification = () => {
       }
     } catch (error) {
       console.error("Error during verification:", error);
+      showToast("Verification failed. Please try again.", "error");
       navigate('/age-not-verified', { state: { reason: 'error' } });
     } finally {
       setIsVerifying(false);

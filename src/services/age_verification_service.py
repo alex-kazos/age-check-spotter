@@ -1,9 +1,11 @@
-from flask import Flask, request, jsonify
-import face_recognition
 import cv2
-import numpy as np
-from datetime import datetime
+from flask import Flask, request, jsonify
 from flask_cors import CORS
+import face_recognition
+import base64
+import io
+from PIL import Image
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -47,27 +49,37 @@ def compare_faces(id_encoding, camera_encoding):
 
 @app.route('/verify', methods=['POST'])
 def verify_age():
-    data = request.json
-    birth_date = data['birth_date']
-    print(birth_date)
+    id_file = request.files.get('id_file')
+    face_image = request.form.get('face_image')
+    birth_date = request.form.get('birth_date')
 
-    # Load and extract face encoding from ID image
-    id_encoding = get_face_encoding(data['id_image'])
-    if id_encoding is None:
+    if not id_file or not face_image or not birth_date:
+        return jsonify({'error': 'Missing required data'}), 400
+
+    # Process ID image
+    id_image = face_recognition.load_image_file(id_file)
+    id_encoding = face_recognition.face_encodings(id_image)
+    if not id_encoding:
         return jsonify({'error': 'No face found in ID image'}), 400
+    id_encoding = id_encoding[0]
 
-    # Capture and extract face encoding from camera image
-    camera_encoding = get_camera_encoding()
-    if camera_encoding is None:
-        return jsonify({'error': 'No face found in camera image'}), 400
+    # Process face image
+    face_image_data = base64.b64decode(face_image)
+    face_image = Image.open(io.BytesIO(face_image_data))
+    face_image_array = face_recognition.load_image_file(io.BytesIO(face_image_data))
+    face_encoding = face_recognition.face_encodings(face_image_array)
+    if not face_encoding:
+        return jsonify({'error': 'No face found in captured image'}), 400
+    face_encoding = face_encoding[0]
 
-    # Compare faces and get similarity score
-    face_distance = compare_faces(id_encoding, camera_encoding)
+    # Compare faces
+    face_distance = face_recognition.face_distance([id_encoding], face_encoding)[0]
     similarity_percentage = (1 - face_distance) * 100
     face_match = face_distance <= 0.6  # Using 0.6 as the threshold
 
-    # Calculate age from the birth date
-    age = calculate_age(birth_date)
+    # Calculate age
+    birth_date = datetime.fromisoformat(birth_date.rstrip('Z'))
+    age = (datetime.now() - birth_date).days // 365
 
     return jsonify({
         'face_match': bool(face_match),
