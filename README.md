@@ -125,7 +125,7 @@ This project is licensed under the MIT License.
 
 ## Contact
 
-For any inquiries or support, please contact the project maintainers at info@essentur.com.
+For any questions, don't hesitate to contact me at alex.kazos@essentur.com.
 
 ---
 
