@@ -98,8 +98,9 @@ const AgeVerification = () => {
     setIsVerifying(true);
     const formData = new FormData();
     formData.append('id_file', idFile);
-    formData.append('face_image', faceImage);
-    formData.append('birth_date', birthDate);
+    formData.append('face_image', faceImage.split(',')[1]); // Remove data:image/jpeg;base64, prefix
+    formData.append('birth_date', birthDate.toISOString());
+
 
     try {
       const response = await axios.post('http://127.0.0.1:5000/verify', formData, {
@@ -108,11 +109,19 @@ const AgeVerification = () => {
         }
       });
 
-      console.log('Server response:', response.data);
-      // Handle the response as needed
+      const { face_match, age, is_over_18, similarity_percentage } = response.data;
+
+      if (face_match && is_over_18) {
+        navigate('/age-verified', { state: { age, similarity_percentage } });
+      } else if (!face_match) {
+        navigate('/age-not-verified', { state: { reason: 'face_mismatch', similarity_percentage } });
+      } else {
+        navigate('/age-not-verified', { state: { reason: 'underage', similarity_percentage } });
+      }
     } catch (error) {
       console.error("Error during verification:", error);
-      showToast("Error during verification. Please try again.", "error");
+      showToast("Verification failed. Please try again.", "error");
+      navigate('/age-not-verified', { state: { reason: 'error' } });
     } finally {
       setIsVerifying(false);
     }
