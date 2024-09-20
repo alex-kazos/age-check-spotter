@@ -24,11 +24,11 @@ const AgeNotVerified = () => {
       initial={{ opacity: 0, scale: 0.5 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen flex items-center justify-center bg-red-100"
+      className="min-h-screen flex items-center justify-center bg-red-100 dark:bg-red-900"
     >
-      <div className="text-center p-8 bg-white rounded-lg shadow-xl">
-        <h1 className="text-4xl font-bold text-red-600 mb-4">Age Not Verified</h1>
-        <p className="text-xl mb-6">{message}</p>
+      <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl">
+        <h1 className="text-4xl font-bold text-red-600 dark:text-red-400 mb-4">Age Not Verified</h1>
+        <p className="text-xl mb-6 dark:text-gray-300">{message}</p>
         <Button onClick={() => navigate('/age-verification')} className="mr-4">
           Try Again
         </Button>
