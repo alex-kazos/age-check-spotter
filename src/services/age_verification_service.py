@@ -6,9 +6,11 @@ import base64
 import io
 from PIL import Image
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 CORS(app)
+
 
 def calculate_age(birth_date):
     today = datetime.today()
@@ -80,6 +82,10 @@ def verify_age():
     # Calculate age
     birth_date = datetime.fromisoformat(birth_date.rstrip('Z'))
     age = (datetime.now() - birth_date).days // 365
+
+    # Clean up temporary files
+    os.remove(id_path)
+    os.remove(face_path)
 
     return jsonify({
         'face_match': bool(face_match),

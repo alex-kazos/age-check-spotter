@@ -13,7 +13,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from '@/hooks/useToast';
-import { DatePicker } from "@/components/ui/date-picker";
 
 const AgeVerification = () => {
   const [idFile, setIdFile] = useState(null);
@@ -102,8 +101,9 @@ const AgeVerification = () => {
     formData.append('face_image', faceImage.split(',')[1]); // Remove data:image/jpeg;base64, prefix
     formData.append('birth_date', birthDate.toISOString());
 
+
     try {
-      const response = await axios.post('http://localhost:5000/verify', formData, {
+      const response = await axios.post('http://127.0.0.1:5000/verify', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -156,11 +156,12 @@ const AgeVerification = () => {
               <Camera className="mr-2 h-4 w-4" /> Open Camera
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[425px]" aria-describedby="dialog-description">
             <DialogHeader>
               <DialogTitle>Capture Face Image</DialogTitle>
             </DialogHeader>
             <div className="space-y-2">
+              <p id="dialog-description" className="sr-only">Use this dialog to capture your face image for verification.</p>
               <video ref={videoRef} autoPlay playsInline className="w-full rounded-md" />
               <div className="flex justify-between mt-4">
                 <Button onClick={() => setIsDialogOpen(false)} variant="outline" className="w-[48%]">Cancel</Button>
@@ -173,7 +174,13 @@ const AgeVerification = () => {
       </Card>
       <Card className="p-4 mb-4">
         <h2 className="text-xl mb-2 text-center">Birth Date</h2>
-        <DatePicker date={birthDate} setDate={setBirthDate} />
+        <Input
+          type="text"
+          value={birthDate}
+          onChange={(e) => setBirthDate(e.target.value)}
+          placeholder="DD/MM/YYYY"
+          className="w-full"
+        />
       </Card>
       <Button onClick={verifyAge} className="w-full" disabled={!idFile || !faceImage || !birthDate || isVerifying}>
         {isVerifying ? 'Verifying...' : 'Verify Age'}
