@@ -109,14 +109,14 @@ const AgeVerification = () => {
         }
       });
 
-      const { face_match, age, is_over_18 } = response.data;
+      const { face_match, age, is_over_18, similarity_percentage } = response.data;
 
       if (face_match && is_over_18) {
-        navigate('/age-verified', { state: { age } });
+        navigate('/age-verified', { state: { age, similarity_percentage } });
       } else if (!face_match) {
-        navigate('/age-not-verified', { state: { reason: 'face_mismatch' } });
+        navigate('/age-not-verified', { state: { reason: 'face_mismatch', similarity_percentage } });
       } else {
-        navigate('/age-not-verified', { state: { reason: 'underage' } });
+        navigate('/age-not-verified', { state: { reason: 'underage', similarity_percentage } });
       }
     } catch (error) {
       console.error("Error during verification:", error);

@@ -3,8 +3,10 @@ import face_recognition
 import cv2
 import numpy as np
 from datetime import datetime
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 def calculate_age(birth_date):
     today = datetime.today()
@@ -40,13 +42,14 @@ def get_camera_encoding():
         return None
     return face_encodings[0]
 
-def compare_faces(id_encoding, camera_encoding, tolerance=0.6):
-    return face_recognition.compare_faces([id_encoding], camera_encoding, tolerance=tolerance)[0]
+def compare_faces(id_encoding, camera_encoding):
+    return face_recognition.face_distance([id_encoding], camera_encoding)[0]
 
 @app.route('/verify', methods=['POST'])
 def verify_age():
     data = request.json
     birth_date = data['birth_date']
+    print(birth_date)
 
     # Load and extract face encoding from ID image
     id_encoding = get_face_encoding(data['id_image'])
@@ -58,8 +61,10 @@ def verify_age():
     if camera_encoding is None:
         return jsonify({'error': 'No face found in camera image'}), 400
 
-    # Compare faces with some tolerance (wiggle room)
-    face_match = compare_faces(id_encoding, camera_encoding, tolerance=0.6)
+    # Compare faces and get similarity score
+    face_distance = compare_faces(id_encoding, camera_encoding)
+    similarity_percentage = (1 - face_distance) * 100
+    face_match = face_distance <= 0.6  # Using 0.6 as the threshold
 
     # Calculate age from the birth date
     age = calculate_age(birth_date)
@@ -67,7 +72,8 @@ def verify_age():
     return jsonify({
         'face_match': bool(face_match),
         'age': age,
-        'is_over_18': age >= 18
+        'is_over_18': age >= 18,
+        'similarity_percentage': similarity_percentage
     })
 
 if __name__ == '__main__':
