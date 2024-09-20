@@ -97,7 +97,7 @@ This service helps businesses maintain compliance with age restriction laws whil
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request or use this project as your template!
 
 ## License
 
