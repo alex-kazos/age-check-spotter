@@ -1,7 +1,7 @@
 ## Essentur Case Study
 
 <p align="center">
-  <img src="public/favicon.ico" alt="AgeCheck Spotter Logo" width="100" height="100">
+  <img src="public/essentur transparent.png" alt="Essentur Logo" width="100" height="100">
 </p>
 
 Essentur builds data-led solutions to scale your creative impact. Make better decisions with Data. Automate processes. Increase efficiency with AI. We experimented with the implementation of an AgeCheck system to address these concerns:
