@@ -17,9 +17,9 @@ Essentur integrated AgeCheck Spotter into their e-commerce platform:
 3. Automated age calculation and verification
 
 
-# AgeCheck Spotter
+# AgeCheck Verification
 
-AgeCheck Spotter is a comprehensive web application designed to help businesses verify the age of their customers quickly and efficiently. This tool is particularly useful for establishments that need to ensure compliance with age restrictions, such as bars, nightclubs, or stores selling age-restricted products.
+AgeCheck is a comprehensive web application designed to help businesses verify the age of their customers quickly and efficiently. This tool is particularly useful for establishments that need to ensure compliance with age restrictions, such as bars, nightclubs, or stores selling age-restricted products.
 
 ## Features
 
