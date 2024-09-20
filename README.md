@@ -1,3 +1,22 @@
+## Essentur Case Study
+
+<p align="center">
+  <img src="public/favicon.ico" alt="AgeCheck Spotter Logo" width="100" height="100">
+</p>
+
+Essentur builds data-led solutions to scale your creative impact. Make better decisions with Data. Automate processes. Increase efficiency with AI. We experimented with the implementation of an AgeCheck system to address these concerns:
+
+### Challenge:
+- Ensure legal compliance for age-restricted product sales
+- Reduce manual age verification processes
+
+### Solution:
+Essentur integrated AgeCheck Spotter into their e-commerce platform:
+1. Seamless ID upload during checkout
+2. Quick facial recognition for identity confirmation
+3. Automated age calculation and verification
+
+
 # AgeCheck Spotter
 
 AgeCheck Spotter is a comprehensive web application designed to help businesses verify the age of their customers quickly and efficiently. This tool is particularly useful for establishments that need to ensure compliance with age restrictions, such as bars, nightclubs, or stores selling age-restricted products.
@@ -11,6 +30,7 @@ AgeCheck Spotter is a comprehensive web application designed to help businesses 
 - Real-time results with detailed verification reports
 - Secure storage of verification data
 - Dark mode support for various lighting conditions
+
 
 ## Technologies Used
 
@@ -105,7 +125,7 @@ This project is licensed under the MIT License.
 
 ## Contact
 
-For any inquiries or support, please contact the project maintainers at support@agecheckspotter.com.
+For any inquiries or support, please contact the project maintainers at info@essentur.com.
 
 ---
 
