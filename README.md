@@ -1,67 +1,112 @@
-# Welcome to your GPT Engineer project
+# AgeCheck Spotter
 
-## Project info
+AgeCheck Spotter is a comprehensive web application designed to help businesses verify the age of their customers quickly and efficiently. This tool is particularly useful for establishments that need to ensure compliance with age restrictions, such as bars, nightclubs, or stores selling age-restricted products.
 
-**Project**: agecheck-spotter
+## Features
 
-**URL**: https://run.gptengineer.app/projects/6f6cd390-03bf-4851-85d8-065480b1bf8b/improve
+- Quick and accurate age verification
+- Face recognition technology for identity confirmation
+- User-friendly interface for both staff and customers
+- Customizable age thresholds to meet different regulatory requirements
+- Real-time results with detailed verification reports
+- Secure storage of verification data
+- Dark mode support for various lighting conditions
 
-## How can I edit this code?
+## Technologies Used
 
-There are several ways of editing your application.
+This project is built with a modern tech stack:
 
-**Use GPT Engineer**
+- Frontend:
+  - [Vite](https://vitejs.dev/) for fast development and building
+  - [React](https://reactjs.org/) for building the user interface
+  - [shadcn/ui](https://ui.shadcn.com/) for beautiful and customizable UI components
+  - [Tailwind CSS](https://tailwindcss.com/) for responsive and efficient styling
+  - [Framer Motion](https://www.framer.com/motion/) for smooth animations
 
-Simply visit the GPT Engineer project at [GPT Engineer](https://gptengineer.app/projects/6f6cd390-03bf-4851-85d8-065480b1bf8b/improve) and start prompting.
+- Backend:
+  - [Flask](https://flask.palletsprojects.com/) for the API server
+  - [OpenCV](https://opencv.org/) and [face-recognition](https://github.com/ageitgey/face_recognition) libraries for image processing and face recognition
 
-Changes made via gptengineer.app will be committed automatically to this repo.
+## Requirements
 
-**Use your preferred IDE**
+To run this project, you need:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in the GPT Engineer UI.
+- Node.js (v14 or later)
+- Python (v3.7 or later)
+- npm or yarn package manager
+- A webcam or camera device for capturing images
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Installation and Setup
 
-Follow these steps:
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/GPT-Engineer-App/agecheck-spotter.git
+   ```
 
-```sh
-git clone https://github.com/GPT-Engineer-App/agecheck-spotter.git
-cd agecheck-spotter
-npm i
+2. Navigate to the project directory:
+   ```sh
+   cd agecheck-spotter
+   ```
 
-# This will run a dev server with auto reloading and an instant preview.
-npm run dev
-```
+3. Install frontend dependencies:
+   ```sh
+   npm install
+   ```
 
-**Edit a file directly in GitHub**
+4. Install backend dependencies:
+   ```sh
+   pip install -r requirements.txt
+   ```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+5. Start the development servers:
+   ```sh
+   npm run start
+   ```
 
-**Use GitHub Codespaces**
+   This command will start both the frontend and backend servers concurrently.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+6. Open your browser and visit `http://localhost:8080` to view the application.
 
-## What technologies are used for this project?
+## Usage
 
-This project is built with .
+1. On the home page, click "Start Age Verification" to begin the process.
+2. Upload an ID document (image or PDF) of the person being verified.
+3. Use the webcam to capture a live image of the person.
+4. Enter the person's birth date.
+5. Click "Verify Age" to process the information.
+6. The system will compare the ID photo with the live image and calculate the person's age.
+7. Results will be displayed, indicating whether the person's age is verified and if they meet the required age threshold.
 
-- Vite
-- React
-- shadcn-ui
-- Tailwind CSS
+## Service Description
 
-## How can I deploy this project?
+AgeCheck Spotter provides a seamless and accurate age verification service by combining document analysis, facial recognition, and date of birth verification. The process works as follows:
 
-All GPT Engineer projects can be deployed directly via the GPT Engineer app.
+1. Document Upload: The system accepts various forms of identification, including driver's licenses, passports, and national ID cards.
 
-Simply visit your project at [GPT Engineer](https://gptengineer.app/projects/6f6cd390-03bf-4851-85d8-065480b1bf8b/improve) and click on Share -> Publish.
+2. Face Capture: Using the device's camera, a live image of the person is captured for comparison with the ID document.
 
-## I want to use a custom domain - is that possible?
+3. Data Processing: The backend service extracts information from the ID document, including the photo and date of birth.
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify or GitHub pages. Visit our docs for more details: [Custom domains](https://docs.gptengineer.app/tips-tricks/custom-domain/)
+4. Face Comparison: Advanced facial recognition algorithms compare the ID photo with the live capture to ensure they match.
+
+5. Age Calculation: The system calculates the person's age based on the provided date of birth.
+
+6. Verification Result: A comprehensive result is returned, indicating whether the age is verified and if the person meets the required age threshold.
+
+This service helps businesses maintain compliance with age restriction laws while providing a quick and non-intrusive verification process for customers.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.
+
+## Contact
+
+For any inquiries or support, please contact the project maintainers at support@agecheckspotter.com.
+
+---
+
+This project was initially generated with [GPT Engineer](https://gptengineer.app) and further improved. You can visit the project page [here](https://gptengineer.app/projects/6f6cd390-03bf-4851-85d8-065480b1bf8b/improve).
