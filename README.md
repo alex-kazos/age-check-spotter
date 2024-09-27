@@ -4,7 +4,7 @@
   <img src="public/essentur transparent.png" alt="Essentur Logo" width="300" height="300">
 </p>
 
-Essentur builds data-led solutions to scale your creative impact. Make better decisions with Data. Automate processes. Increase efficiency with AI. We experimented with the implementation of an AgeCheck system to address these concerns:
+[Essnetur](https://essentur.com/) builds data-led solutions to scale your creative impact. Make better decisions with Data. Automate processes. Increase efficiency with AI. We experimented with the implementation of an AgeCheck system to address these concerns:
 
 ### Challenge:
 - Ensure legal compliance for age-restricted product sales
