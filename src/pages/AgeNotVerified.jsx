@@ -6,18 +6,18 @@ import { motion } from "framer-motion";
 const AgeNotVerified = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { reason, similarity_percentage } = location.state || {};
+  const { reason } = location.state || {};
   const [message, setMessage] = useState('');
 
   useEffect(() => {
     if (reason === 'face_mismatch') {
-      setMessage(`The face on the ID does not match the captured image. (Similarity: ${similarity_percentage.toFixed(2)}%)`);
+      setMessage(`The face on the ID does not match the captured image.`);
     } else if (reason === 'underage') {
       setMessage("You must be 18 or older to proceed.");
     } else {
       setMessage("Sorry, the identification process wasn't successful. Please try again.");
     }
-  }, [reason, similarity_percentage]);
+  }, [reason]);
 
   return (
     <motion.div
