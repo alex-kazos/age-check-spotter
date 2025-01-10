@@ -12,7 +12,8 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "start": "concurrently \"npm run dev\" \"python src/services/age_verification_service.py\""
+    "start": "concurrently \"npm run dev\" \"python src/services/age_verification_service.py\"",
+    "clean-install": "rm -rf node_modules && npm cache clean --force && npm ci"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
